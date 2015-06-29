@@ -58,7 +58,85 @@ function addData(db, storename) {
 	}
 };
 
+function getDataByKey(db,storeName,value) {
+	var transaction=db.transaction(storeName,'readwrite');
+	var store=transaction.objectStore(storeName);
+	var request=store.get(value);
+	request.onsuccess=function (e) {
+		var student=e.target.result;
+		console.log(student.name);	
+	};	
+};
 
+function updateDataByKey(db,storename,value) {
+	var transaction=db.transaction(storename,'readwrite');
+	var store=transaction.objectStore(storename);
+	var request=store.get(value);
+	request.onsuccess=function (e) {
+		var student=e.target.result;
+		student.age=33;
+store.put(student);
+	};
+};
+
+function  deleteDataByKey(db,storename,value) {
+	var transaction=db.transaction(storename,'readwrite');
+	var store=transaction.objectStore(storename);
+	store.delete(value);
+};
+
+function clearObjectStore(db,storename) {
+		var transaction=db.transaction(storename,'readwrite');
+	var store=transaction.objectStore(storename);
+	store.clear();
+};
+
+function deleteObjectStore(db,storename) {
+	var transaction=db.transaction(storename,'versionchange');
+db.deleteObjectStore(storename);
+};
+
+function fetchStoreByCursor(db,storename) {
+	var transaction=db.transaction(storename);
+	var store=transaction.objectStore(storename);
+	var request=store.openCursor();
+	request.onsuccess=function (e) {
+		var cursor=e.target.result;
+		if(cursor)
+		{
+			console.log(cursor.key);
+			var currentStudent=cursor.value;
+			console.log(currentStudent.name);
+			cursor.continue();
+		}
+	};
+};
+
+function getDataByIndex(db,storename) {
+	var transaction=db.transaction(storename);
+	var store=transaction.objectStore(storename);
+	var index=store.index('ageindex');
+	index.get(22).onsuccess=function (e) {
+	    var student=e.target.result;
+		console.log(student.id);	
+	};
+};
+
+function getMultiData(db,storename) {
+	var transaction=db.transaction(storename);
+	var store=transaction.objectStore(storename);
+	var index=store.index('nameindex');
+	var request=index.openCursor(null,IDBCursor.prev);
+	request.onsuccess=function (e) {
+	   var cursor=e.target.result;
+	   if(cursor)
+	   {
+		   var student=e.target.result;
+		   console.log(student.name);
+		   cursor.continue();
+	   }	
+	};
+};
 openDB(DBEntity.name, DBEntity.version);
 setTimeout(function () {
 	addData(DBEntity.db, 'students');
