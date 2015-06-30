@@ -1,7 +1,7 @@
 var DBEntity = {
 	name: 'testdb',
-	version: 1,
-	db: 'students'
+	version: 2,
+	db: null
 },
 	students = [
 		{
@@ -20,23 +20,34 @@ var DBEntity = {
             age: 26
         }
 	];
+	
+openDB(DBEntity.name, DBEntity.version);
+setTimeout(function () {
+	addData(DBEntity.db, 'students');
+}, 1000);
+
 
 function openDB(name, version) {
-	var version = version || 1,
-		request = window.indexedDB.open(name, version);
-				request.onerror = function (event) {
+	var nowversion = version || 1;
+	var request = window.indexedDB.open(name, nowversion);
+
+	request.onerror = function (event) {
 		console.log('db operation failed');
 		console.log('error code' + event.target.errorCode);
 	};
+
 	request.onsuccess = function (event) {
+		console.log('onsuccess');
 		DBEntity.db = event.target.result;
 	};
 
+//只有在改变db版本的时候才触发
 	request.onupgradeneeded = function (event) {
-		var db = event.target.result;
-		console.log(db.objectStoreNames);
+		var db = request.result;
 		if (!db.objectStoreNames.contains('students')) {
-			db.createObjectStore('students', { keyPath: 'id' });
+			var store=db.createObjectStore('students', { keyPath: 'id' });
+		    var ageindex=store.createIndex('ageindex','age');
+		    var nameindex=store.createIndex('nameindex','name');
 		}
 		console.log('db version changed to ' + version);
 	};
@@ -58,86 +69,82 @@ function addData(db, storename) {
 	}
 };
 
-function getDataByKey(db,storeName,value) {
-	var transaction=db.transaction(storeName,'readwrite');
-	var store=transaction.objectStore(storeName);
-	var request=store.get(value);
-	request.onsuccess=function (e) {
-		var student=e.target.result;
-		console.log(student.name);	
-	};	
-};
-
-function updateDataByKey(db,storename,value) {
-	var transaction=db.transaction(storename,'readwrite');
-	var store=transaction.objectStore(storename);
-	var request=store.get(value);
-	request.onsuccess=function (e) {
-		var student=e.target.result;
-		student.age=33;
-store.put(student);
+function getDataByKey(db, storeName, value) {
+	var transaction = db.transaction(storeName, 'readwrite');
+	var store = transaction.objectStore(storeName);
+	var request = store.get(value);
+	request.onsuccess = function (e) {
+		var student = e.target.result;
+		console.log(student.name);
 	};
 };
 
-function  deleteDataByKey(db,storename,value) {
-	var transaction=db.transaction(storename,'readwrite');
-	var store=transaction.objectStore(storename);
+function updateDataByKey(db, storename, value) {
+	var transaction = db.transaction(storename, 'readwrite');
+	var store = transaction.objectStore(storename);
+	var request = store.get(value);
+	request.onsuccess = function (e) {
+		var student = e.target.result;
+		student.age = 33;
+		store.put(student);
+	};
+};
+
+function deleteDataByKey(db, storename, value) {
+	var transaction = db.transaction(storename, 'readwrite');
+	var store = transaction.objectStore(storename);
 	store.delete(value);
 };
 
-function clearObjectStore(db,storename) {
-		var transaction=db.transaction(storename,'readwrite');
-	var store=transaction.objectStore(storename);
+function clearObjectStore(db, storename) {
+	var transaction = db.transaction(storename, 'readwrite');
+	var store = transaction.objectStore(storename);
 	store.clear();
 };
 
-function deleteObjectStore(db,storename) {
-	var transaction=db.transaction(storename,'versionchange');
-db.deleteObjectStore(storename);
+function deleteObjectStore(db, storename) {
+	var transaction = db.transaction(storename, 'versionchange');
+	db.deleteObjectStore(storename);
 };
 
-function fetchStoreByCursor(db,storename) {
-	var transaction=db.transaction(storename);
-	var store=transaction.objectStore(storename);
-	var request=store.openCursor();
-	request.onsuccess=function (e) {
-		var cursor=e.target.result;
-		if(cursor)
-		{
+function fetchStoreByCursor(db, storename) {
+	var transaction = db.transaction(storename, 'readwrite');
+	var store = transaction.objectStore(storename);
+	var request = store.openCursor();
+	request.onsuccess = function (e) {
+		var cursor = e.target.result;
+		if (cursor) {
 			console.log(cursor.key);
-			var currentStudent=cursor.value;
+			var currentStudent = cursor.value;
 			console.log(currentStudent.name);
+			console.log(currentStudent.age);
 			cursor.continue();
 		}
 	};
 };
 
-function getDataByIndex(db,storename) {
-	var transaction=db.transaction(storename);
-	var store=transaction.objectStore(storename);
-	var index=store.index('ageindex');
-	index.get(22).onsuccess=function (e) {
-	    var student=e.target.result;
-		console.log(student.id);	
+function getDataByIndex(db, storename,searchindex) {
+	var transaction = db.transaction(storename);
+	var store = transaction.objectStore(storename);
+	var index = store.index('ageindex');
+	var request =index.get(parseInt(searchindex));
+	request.onsuccess = function () {
+		var student = request.result;
+		console.log(student.id);
 	};
 };
 
-function getMultiData(db,storename) {
-	var transaction=db.transaction(storename);
-	var store=transaction.objectStore(storename);
-	var index=store.index('nameindex');
-	var request=index.openCursor(null,IDBCursor.prev);
-	request.onsuccess=function (e) {
-	   var cursor=e.target.result;
-	   if(cursor)
-	   {
-		   var student=e.target.result;
-		   console.log(student.name);
-		   cursor.continue();
-	   }	
+function getMultiData(db, storename) {
+	var transaction = db.transaction(storename);
+	var store = transaction.objectStore(storename);
+	var index = store.index('nameindex');
+	var request = index.openCursor(null, IDBCursor.prev);
+	request.onsuccess = function (e) {
+		var cursor = e.target.result;
+		if (cursor) {
+			var student = e.target.result.value;
+			console.log(student.name);
+			cursor.continue();
+		}
 	};
 };
-openDB(DBEntity.name, DBEntity.version);
-setTimeout(function () {
-	addData(DBEntity.db, 'students');
-}, 1000);

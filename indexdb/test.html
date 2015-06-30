@@ -1,8 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-cn">
 	<head>
+		<meta charset="utf-8" />
 		<title>indexdb</title>
-		<script src="app.js" />
+		<script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+		<script src="http://apps.bdimg.com/libs/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+		<script src="app.js"></script>
+		<link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.min.css" />
 	</head>
-	<body></body>
-	<html>
+	<body>
+		<div id="container" class='container'>
+			<div class="row">
+				<button class='btn btn-info' onclick="deleteDB('testdb')">删除数据库</button>
+				<button class='btn btn-primary' onclick="fetchStoreByCursor(DBEntity.db,'students')">查询数据库</button>
+				<button class='btn btn-primary' onclick="getMultiData(DBEntity.db,'students')">显示所有名称</button>
+			</div>
+			<div class="row">
+				<div class="col-lg-6">
+					<div class="input-group">
+						<input type="text" class="form-control" placeholder="Search for..." id="searchindex">
+						<span class="input-group-btn">
+							<button class="btn btn-default" type="button" onclick="getDataByIndex(DBEntity.db,'students',$('#searchindex').val())">搜索</button>
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>
