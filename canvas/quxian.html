@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta charset="utf-8" />
+		<title>Canvas</title>
+		<link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.min.css" />
+		<script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+		<script src="http://apps.bdimg.com/libs/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+		<script>
+			function draw() {
+			var canvas=$('#canvas')[0];
+			if(canvas.getContext)
+			{
+				var ctx=canvas.getContext('2d');
+				ctx.beginPath();
+				ctx.moveTo(100,100);
+				ctx.lineTo(150,150);
+				ctx.lineTo(200,150);
+				ctx.stroke();
+				
+				ctx.beginPath();
+				ctx.moveTo(100,100);
+				ctx.quadraticCurveTo(150,150,200,150);
+				ctx.stokeStyle='red';
+				ctx.stroke();
+			}
+			}
+		</script>
+		<style type="text/css">
+			canvas { border: 1px solid black; }
+		</style>
+	</head>
+	<body onload='draw()'>
+		<canvas id="canvas" width="800" height="800">浏览器不支持!</canvas>
+		<div id="container" class='container'></div>
+	</body>
+
+</html>

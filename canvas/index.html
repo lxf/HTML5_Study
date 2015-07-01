@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta charset="utf-8" />
+		<title>Canvas</title>
+		<link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.min.css" />
+		<script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+		<script src="http://apps.bdimg.com/libs/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+		<script>
+			function draw() {
+				var canvas=$('#canvas')[0];
+			if(canvas.getContext)
+			{
+				var ctx=canvas.getContext('2d');
+				// ctx.fillStyle='rgb(200,0,0)';
+				// ctx.fillRect(10,10,55,50);
+				// ctx.clearRect(20,20,10,10);
+				// ctx.strokeRect(20,20,10,10);
+				// ctx.fillStyle='rgba(0,200,0,0.5)';
+				// ctx.fillRect(50,50,30,30);
+				
+				// var path=new Path2D();
+				// path.moveTo(200,200);
+				// path.lineTo(300,200);
+				// path.lineTo(200,300);
+				
+					ctx.beginPath();
+    				ctx.arc(100,100,50,1.1*Math.PI,1.9*Math.PI,false);
+					ctx.lineWidth=15;
+					ctx.strokeStyle='red';
+					ctx.stroke();
+	
+			}
+			}
+		</script>
+		<style type="text/css">
+			canvas { border: 1px solid black; }
+		</style>
+	</head>
+	<body onload='draw()'>
+		<canvas id="canvas" width="800" height="800">浏览器不支持!</canvas>
+		<div id="container" class='container'></div>
+	</body>
+
+</html>
